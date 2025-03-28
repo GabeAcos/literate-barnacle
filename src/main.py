@@ -99,7 +99,7 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
             print("Before replace:", template_file)
             template_file = template_file.replace('href="/', href)
             print("After replace:", template_file)
-            template_file = template_file.replace('src=/"', src)
+            template_file = template_file.replace('src="/', src)
             print(f"After replacing:", template_file)
             file_path = current_path.replace("content", "docs")
             file_path = file_path.replace(".md", ".html")
