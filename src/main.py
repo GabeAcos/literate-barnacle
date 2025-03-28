@@ -10,7 +10,7 @@ if len(sys.argv) > 1:
 else:
     BASEPATH = ""
 
-docs_PATH = os.path.join(BASEPATH,"docs")
+docs_PATH = "docs"
 
 
 def copy_static(path):
@@ -91,11 +91,16 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
             htmlnode = markdown_to_html_node(markdown_file)
             content = htmlnode.to_html()
             title = extract_title(markdown_file)
+            
             template_file = template_file.replace(r"{{ Content }}", content)
             template_file = template_file.replace(r"{{ Title }}", title)
-            template_file = template_file.replace('href=/"',f'href={BASEPATH}' )
-            template_file = template_file.replace('src="', f'src={BASEPATH}')
-
+            href = f'href="{BASEPATH}'
+            src = f'src="{BASEPATH}'
+            print("Before replace:", template_file)
+            template_file = template_file.replace('href="/', href)
+            print("After replace:", template_file)
+            template_file = template_file.replace('src=/"', src)
+            print(f"After replacing:", template_file)
             file_path = current_path.replace("content", "docs")
             file_path = file_path.replace(".md", ".html")
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
