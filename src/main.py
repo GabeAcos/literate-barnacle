@@ -45,28 +45,60 @@ def extract_title(markdown):
     return head[0]
 
 
-def generate_page(from_path, template_path, dest_path):
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
-    with open(from_path, "r") as f:
-        markdown_file = f.read()
-    with open(template_path, "r") as f:
-        template_file = f.read()
+# def generate_page(from_path, template_path, dest_path):
+#     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+#     with open(from_path, "r") as f:
+#         markdown_file = f.read()
+#     with open(template_path, "r") as f:
+#         template_file = f.read()
 
-    htmlnode = markdown_to_html_node(markdown_file)
-    content = htmlnode.to_html()
-    title = extract_title(markdown_file)
-    template_file = template_file.replace(r"{{ Content }}", content)
-    template_file = template_file.replace(r"{{ Title }}", title)
+#     htmlnode = markdown_to_html_node(markdown_file)
+#     content = htmlnode.to_html()
+#     title = extract_title(markdown_file)
+#     template_file = template_file.replace(r"{{ Content }}", content)
+#     template_file = template_file.replace(r"{{ Title }}", title)
 
-    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-    with open(dest_path, "w") as f:
-        f.write(template_file)
+#     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+#     with open(dest_path, "w") as f:
+#         f.write(template_file)
+
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    print(
+        f"Generating page from {dir_path_content} to {dest_dir_path} using {template_path}"
+    )
+    for dir in os.listdir(dir_path_content):
+        current_path = os.path.join(dir_path_content, dir)
+        if not os.path.isfile(current_path):
+            dir_path = current_path.replace("content", "public")
+            if not os.path.exists(dir_path):
+                os.mkdir(dir_path)
+            generate_pages_recursive(current_path, template_path, dest_dir_path)
+        else:
+
+            with open(current_path, "r") as f:
+                markdown_file = f.read()
+
+            with open(template_path, "r") as f:
+                template_file = f.read()
+
+            htmlnode = markdown_to_html_node(markdown_file)
+            content = htmlnode.to_html()
+            title = extract_title(markdown_file)
+            template_file = template_file.replace(r"{{ Content }}", content)
+            template_file = template_file.replace(r"{{ Title }}", title)
+
+            file_path = current_path.replace("content", "public")
+            file_path = file_path.replace(".md", ".html")
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            with open(file_path, "w") as f:
+                f.write(template_file)
 
 
 def main():
     clear_public()
     copy_static("static/")
-    generate_page("content/index.md", "template.html", "public/index.html")
+    generate_pages_recursive("content", "template.html", "public")
 
 
 if __name__ == "__main__":
