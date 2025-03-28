@@ -8,7 +8,7 @@ import sys
 if len(sys.argv) > 1:
     BASEPATH = sys.argv[1]
 else:
-    BASEPATH = "/"
+    BASEPATH = ""
 
 docs_PATH = os.path.join(BASEPATH,"docs")
 
