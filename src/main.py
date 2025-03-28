@@ -88,19 +88,21 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
             with open(template_path, "r") as f:
                 template_file = f.read()
 
+            href = f'href="{BASEPATH}'
+            src = f'src="{BASEPATH}'
+
             htmlnode = markdown_to_html_node(markdown_file)
             content = htmlnode.to_html()
+            content = content.replace('src="/', src)
             title = extract_title(markdown_file)
             
             template_file = template_file.replace(r"{{ Content }}", content)
             template_file = template_file.replace(r"{{ Title }}", title)
-            href = f'href="{BASEPATH}'
-            src = f'src="{BASEPATH}'
-            print("Before replace:", template_file)
+
+            
+            
             template_file = template_file.replace('href="/', href)
-            print("After replace:", template_file)
-            template_file = template_file.replace('src="/', src)
-            print(f"After replacing:", template_file)
+            
             file_path = current_path.replace("content", "docs")
             file_path = file_path.replace(".md", ".html")
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
