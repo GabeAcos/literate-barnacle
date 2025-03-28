@@ -3,8 +3,14 @@ from htmlnode import *
 from markdown_blocks import *
 import os
 import shutil
+import sys
 
-PUBLIC_PATH = "public"
+if len(sys.argv) > 1:
+    BASEPATH = sys.argv[1]
+else:
+    BASEPATH = "/"
+
+doc_PATH = os.path.join(BASEPATH,"doc")
 
 
 def copy_static(path):
@@ -13,7 +19,7 @@ def copy_static(path):
         current_path = os.path.join(path, dir)
         # print(f"current path: {current_path}")
         if not os.path.isfile(current_path):
-            dir_path = current_path.replace("static", "public")
+            dir_path = current_path.replace("static", "doc")
             if not os.path.exists(dir_path):
                 os.mkdir(dir_path)
             # print(f"not a file: {current_path}")
@@ -21,19 +27,19 @@ def copy_static(path):
         else:
             file_path = os.path.join(path, dir)
             # print(f"file path: {file_path}")
-            public = file_path.replace("static", "public")
-            # print(f"file: {public}")
-            shutil.copy(file_path, public)
+            doc = file_path.replace("static", "doc")
+            # print(f"file: {doc}")
+            shutil.copy(file_path, doc)
             continue
 
 
-def clear_public():
-    # check if public folder exists, if it does, delete and recreate it
-    if os.path.exists(PUBLIC_PATH):
-        shutil.rmtree(PUBLIC_PATH)
-        os.mkdir(PUBLIC_PATH)
+def clear_doc():
+    # check if doc folder exists, if it does, delete and recreate it
+    if os.path.exists(doc_PATH):
+        shutil.rmtree(doc_PATH)
+        os.mkdir(doc_PATH)
     else:
-        os.mkdir(PUBLIC_PATH)
+        os.mkdir(doc_PATH)
 
 
 def extract_title(markdown):
@@ -70,7 +76,7 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
     for dir in os.listdir(dir_path_content):
         current_path = os.path.join(dir_path_content, dir)
         if not os.path.isfile(current_path):
-            dir_path = current_path.replace("content", "public")
+            dir_path = current_path.replace("content", "doc")
             if not os.path.exists(dir_path):
                 os.mkdir(dir_path)
             generate_pages_recursive(current_path, template_path, dest_dir_path)
@@ -87,8 +93,9 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
             title = extract_title(markdown_file)
             template_file = template_file.replace(r"{{ Content }}", content)
             template_file = template_file.replace(r"{{ Title }}", title)
-
-            file_path = current_path.replace("content", "public")
+            #template_file = template_file.replace('href=/"',f'href={BASEPATH}' )
+            #template_file = template_file.replace('src="', f'src={BASEPATH}')
+            file_path = current_path.replace("content", "doc")
             file_path = file_path.replace(".md", ".html")
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             with open(file_path, "w") as f:
@@ -96,9 +103,9 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
 
 
 def main():
-    clear_public()
+    clear_doc()
     copy_static("static/")
-    generate_pages_recursive("content", "template.html", "public")
+    generate_pages_recursive("content", "template.html", "doc")
 
 
 if __name__ == "__main__":
